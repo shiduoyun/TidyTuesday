@@ -3,3 +3,50 @@ title: "2025-01-21"
 format: html
 ---
 
+```{r}
+# import dataset
+exped_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/exped_tidy.csv')
+peaks_tidy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-01-21/peaks_tidy.csv')
+library(tidyverse)
+mountain_tidy = left_join(exped_tidy, peaks_tidy)
+```
+```{r}
+glimpse(exped_tidy)
+```
+
+```{r}
+library(dplyr)
+
+plot <- mountain_tidy %>%
+  filter(TOTMEMBERS > 0) %>%
+  mutate(
+    # Create a new variable that bins TOTMEMBERS in width=5 intervals
+    TOTMEMBERS_BIN = cut_width(TOTMEMBERS, width = 5, boundary = 0)
+  ) %>%
+  group_by(TOTMEMBERS_BIN) %>%
+  summarise(
+    count = n(),  # how many rows (expeditions) in each bin
+    total_successes = sum(SUCCESS1, na.rm = TRUE),
+    success_rate = total_successes / count
+  )
+```
+
+```{r}
+library(scales)
+library(ggthemes)
+
+plot %>% ggplot (aes(x=TOTMEMBERS_BIN, y=success_rate)) +
+  geom_col(fill="#503f3f") +
+  geom_text(
+    aes(label = percent(success_rate, accuracy = 0.01)), 
+    nudge_y = -0.03,
+    color = "white",
+    fontface = "bold",
+    size = 3
+  ) +
+  theme_economist_white(gray_bg = FALSE) +
+  labs(x="Group Size", y="Success Climb Rate",title="Success Rate by Team Size")
+
+ggsave(filename = "1-21-2025.png", plot = last_plot())
+```
+
