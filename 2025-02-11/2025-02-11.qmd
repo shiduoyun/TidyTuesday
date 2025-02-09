@@ -1,0 +1,33 @@
+---
+title: "2025-02-11"
+format: html
+---
+
+```{r}
+library(ggwordcloud)
+library(tidyverse)
+library(ggplot2)
+library("viridis")      
+cdc_datasets <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-11/cdc_datasets.csv')
+fpi_codes <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-11/fpi_codes.csv')
+omb_codes <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-02-11/omb_codes.csv')
+
+```
+
+```{r}
+data=cdc_datasets %>% 
+  count(category) %>%
+  mutate(label = paste0(category, " (", n, ")"))
+
+data %>% ggplot()+
+  geom_text_wordcloud(aes(label=label,size=n,color=log(n)))+
+  theme_minimal(base_size = 14)+
+  scale_color_viridis_c(option="G",begin=0.2,end=0.8)+
+  labs(title="Top Thematic Categories of Dataset Been Taken Down")+
+  theme(plot.title = element_text(size = 14,face = "bold",color = viridisLite::plasma(1),hjust = -0.5))
+
+
+  ggsave(filename = "wordcloud.jpg")
+  
+```
+
