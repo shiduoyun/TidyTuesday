@@ -1,0 +1,75 @@
+---
+title: "2025-03-18"
+author: "Winnie"
+date: "2025-03-26"
+output: html_document
+---
+
+```{r}
+
+palmtrees <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2025/2025-03-18/palmtrees.csv')
+```
+```{r}
+# Clean data provided by {palmtrees} R package. No cleaning was necessary.
+# install.packages("devtools")
+
+devtools::install_github("EmilHvitfeldt/palmtrees")
+library(palmtrees)
+library(dplyr)
+
+palmtrees <- palmtrees::palmtrees |>
+  dplyr::mutate(
+    dplyr::across(
+      "max_leaf_number",
+      as.integer
+    )
+  )
+
+```
+
+```{r}
+head(palmtrees)
+dim(palmtrees)
+str(palmtrees)
+```
+```{r}
+unique(palmtrees$main_fruit_colors)
+palmtrees=palmtrees%>%
+  separate(col =main_fruit_colors, into = c("color_1", "color_2", "extra"), sep = "; ", fill = "right") %>%
+  select(-extra)
+```
+```{r}
+valid_colors <- colors()
+
+palmtrees %>%
+  filter(color_1 %in% valid_colors, color_2 %in% valid_colors) %>%
+  ggplot(aes(x = color_1, y = color_2, fill = color_1)) +
+  geom_tile(color = "white") +
+  scale_fill_identity() +
+  theme_classic() +
+  labs(
+    title = "Color 1 vs. Color 2",
+    x = "Color 1",
+    y = "Color 2"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+```{r}
+library(ggplot2)
+library(dplyr)
+
+palmtrees %>%
+  filter(!is.na(max_stem_height_m)) %>%
+  ggplot(aes(x = reorder(palm_subfamily, max_stem_height_m, median, na.rm = TRUE), 
+             y = max_stem_height_m)) +
+  geom_boxplot(fill = "seagreen") +
+  coord_flip() +
+  labs(
+    title = "Max Stem Height Across Palm Subfamilies",
+    x = "Palm Subfamily",
+    y = "Max Stem Height (m)"
+  ) +
+  theme_classic()
+```
+
+
