@@ -1,0 +1,11 @@
+---
+title: "2022-08-09"
+author: "Winnie Shi"
+format: html
+editor: visual
+---
+
+```{r load-data}
+library(readr)
+wheels <- read_csv("Desktop/26Fall/DS456.tmp/TidyTuesday/2022-08-09/wheels.csv")
+```
